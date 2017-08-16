@@ -1,20 +1,22 @@
 package common.ai;
 
+import common.model.Command;
+
 import java.util.Scanner;
 
 public abstract class AbstractAI {
 
   protected abstract void init();
   protected abstract void readInput();
-  protected abstract void think();
-  protected abstract void sendOutput();
+  protected abstract Command think();
+  protected abstract void sendOutput(Command command);
 
   public final void start() {
     init();
     while(true) {
       readInput();
-      think();
-      sendOutput();
+      Command command = think();
+      sendOutput(command);
       round++;
     }
   }
@@ -23,6 +25,6 @@ public abstract class AbstractAI {
     this.scanner = scanner;
   }
 
-  private final Scanner scanner;
+  protected final Scanner scanner;
   protected int round;
 }
