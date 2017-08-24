@@ -157,7 +157,7 @@ public class AI extends AbstractAI {
     Set<Point2I> safePoints = new HashSet<>(available.keySet());
     safePoints.removeIf(p -> heatMap.get(p) < 1_000_000);
     if (safePoints.isEmpty()) {
-      MoveCommand command = new MoveCommand(hero.position);
+      Move command = new Move(hero.position, Move.MoveType.MOVE);
       command.message = "IT'S A TRAP!";
       return command;
     }
@@ -186,7 +186,7 @@ public class AI extends AbstractAI {
       }
 
       if (closestItem != null) {
-        return new MoveCommand(closestItem);
+        return new Move(closestItem, Move.MoveType.MOVE);
       }
     }
 
@@ -197,18 +197,18 @@ public class AI extends AbstractAI {
           new Bomb(hero.position, -1, -1, hero.bombRange),
           new HashSet<>(safePoints)
         );
-        return new BombCommand(closestSafePoint != null ? closestSafePoint : bestPlaceToBomb);
+        return new Move(closestSafePoint != null ? closestSafePoint : bestPlaceToBomb, Move.MoveType.BOMB);
       } else {
-        return new MoveCommand(bestPlaceToBomb);
+        return new Move(bestPlaceToBomb, Move.MoveType.MOVE);
       }
     }
 
     Point2I closestSafePoint = findClosestSafePoint(null, new HashSet<>(safePoints));
     if (closestSafePoint != null) {
-      return new MoveCommand(closestSafePoint);
+      return new Move(closestSafePoint, Move.MoveType.MOVE);
     }
 
-    MoveCommand command = new MoveCommand(hero.position);
+    Move command = new Move(hero.position, Move.MoveType.MOVE);
     command.message = "IT'S A TRAP!";
     return command;
   }

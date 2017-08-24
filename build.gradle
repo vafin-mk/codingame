@@ -2,15 +2,15 @@ group 'me.solve'
 version '1.0'
 
 buildscript {
-    ext.kotlin_version = '1.1.3-eap-85'
+  ext.kotlin_version = '1.1.4'
 
-    repositories {
-        maven { url 'http://dl.bintray.com/kotlin/kotlin-eap-1.1' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+  repositories {
+    maven { url 'http://dl.bintray.com/kotlin/kotlin-eap-1.1' }
+    mavenCentral()
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
 }
 
 apply plugin: 'java'
@@ -19,88 +19,94 @@ apply plugin: 'kotlin'
 sourceCompatibility = 1.8
 
 repositories {
-    maven { url 'http://dl.bintray.com/kotlin/kotlin-eap-1.1' }
-    mavenCentral()
+  maven { url 'http://dl.bintray.com/kotlin/kotlin-eap-1.1' }
+  mavenCentral()
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+  testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+  kotlinOptions.jvmTarget = "1.8"
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+  kotlinOptions.jvmTarget = "1.8"
 }
 
 task buildHypersonic() {
-    doLast {
-        build(new File("$projectDir/src/main/java/multiplayer/hypersonic"))
-    }
+  doLast {
+    build(new File("$projectDir/src/main/java/multiplayer/hypersonic"))
+  }
+}
+
+task buildGhostCell() {
+  doLast {
+    build(new File("$projectDir/src/main/java/multiplayer/ghostcell"))
+  }
 }
 
 def sourceList(File dir) {
-    def files = new ArrayList<File>()
-    for (file in dir.listFiles()) {
-        println file.name
-        if (file.name == "Player.java" || file.name == "Rules.md") {
-            continue
-        }
-        if (file.isDirectory()) {
-            files.addAll(sourceList(file))
-            continue
-        }
-        files.add(file)
+  def files = new ArrayList<File>()
+  for (file in dir.listFiles()) {
+    println file.name
+    if (file.name == "Player.java" || file.name == "Rules.md") {
+      continue
     }
-    return files
+    if (file.isDirectory()) {
+      files.addAll(sourceList(file))
+      continue
+    }
+    files.add(file)
+  }
+  return files
 }
 
 static def prepareSource(String source) {
-    def abstractz = "abstract"
-    def clazz = "class"
-    def enumz = "enum"
-    def interfaze = "interface"
-    def abstractzIndex = source.indexOf(abstractz)
-    def clazzIndex = source.indexOf(clazz)
-    def enumzIndex = source.indexOf(enumz)
-    def interfazeIndex = source.indexOf(interfaze)
-    if (abstractzIndex > 0) return source.substring(abstractzIndex)
-    if (clazzIndex > 0) return source.substring(clazzIndex)
-    if (enumzIndex > 0) return source.substring(enumzIndex)
-    if (interfazeIndex > 0) return source.substring(interfazeIndex)
-    return source
+  def abstractz = "abstract"
+  def clazz = "class"
+  def enumz = "enum"
+  def interfaze = "interface"
+  def abstractzIndex = source.indexOf(abstractz)
+  def clazzIndex = source.indexOf(clazz)
+  def enumzIndex = source.indexOf(enumz)
+  def interfazeIndex = source.indexOf(interfaze)
+  if (abstractzIndex > 0) return source.substring(abstractzIndex)
+  if (clazzIndex > 0) return source.substring(clazzIndex)
+  if (enumzIndex > 0) return source.substring(enumzIndex)
+  if (interfazeIndex > 0) return source.substring(interfazeIndex)
+  return source
 }
 
 def build(aiDirectory) {
-    def commonDirectory = new File("$projectDir/src/main/java/common")
-    def commonFiles = sourceList(commonDirectory)
-    def aiFiles = sourceList(aiDirectory)
-    def builder = new StringBuilder()
-    def separator = "\n"
-    def doubleSeparator = "\n\n"
-    //imports
-    builder.append("import java.util.*;").append(separator)
-    builder.append("import java.util.stream.*;").append(separator)
-    builder.append("import java.lang.*;").append(separator)
-    builder.append(separator)
-    //main class
-    builder.append("class Player { public static void main(String args[]) {" +
-        "    new AI(new Scanner(System.in)).start();" +
-        "  }}")
-    builder.append(doubleSeparator)
-    //other classes
-    aiFiles.each { file ->
-        builder.append(prepareSource(file.text)).append(doubleSeparator)
-    }
-    commonFiles.each { file ->
-        builder.append(prepareSource(file.text)).append(doubleSeparator)
-    }
-    def filename = aiDirectory.path + "/Player.java"
-    def file = new File(filename)
-    def w = file.newWriter()
+  def commonDirectory = new File("$projectDir/src/main/java/common")
+  def commonFiles = sourceList(commonDirectory)
+  def aiFiles = sourceList(aiDirectory)
+  def builder = new StringBuilder()
+  def separator = "\n"
+  def doubleSeparator = "\n\n"
+  //imports
+  builder.append("import java.util.*;").append(separator)
+  builder.append("import java.util.stream.*;").append(separator)
+  builder.append("import java.lang.*;").append(separator)
+  builder.append(separator)
+  //main class
+  builder.append("class Player { public static void main(String args[]) {" +
+      "    new AI(new Scanner(System.in)).start();" +
+      "  }}")
+  builder.append(doubleSeparator)
+  //other classes
+  aiFiles.each { file ->
+    builder.append(prepareSource(file.text)).append(doubleSeparator)
+  }
+  commonFiles.each { file ->
+    builder.append(prepareSource(file.text)).append(doubleSeparator)
+  }
+  def filename = aiDirectory.path + "/Player.java"
+  def file = new File(filename)
+  def w = file.newWriter()
 
-    w << builder.toString()
-    w.close()
+  w << builder.toString()
+  w.close()
 }
