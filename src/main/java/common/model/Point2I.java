@@ -28,6 +28,16 @@ public class Point2I {
     return Math.abs(x - other.x) + Math.abs(y - other.y);
   }
 
+  public double distSquared(Point2I other) {
+    double xOffset = other.x - x;
+    double yOffset = other.y - y;
+    return xOffset * xOffset + yOffset * yOffset;
+  }
+
+  public double dist(Point2I other) {
+    return Math.sqrt(distSquared(other));
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
