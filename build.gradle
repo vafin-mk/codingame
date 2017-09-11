@@ -65,6 +65,12 @@ task buildGameOfDrones() {
   }
 }
 
+task buildWondevWoman() {
+  doLast {
+    build(new File("$projectDir/src/main/java/multiplayer/wondevwoman"))
+  }
+}
+
 def sourceList(File dir) {
   def files = new ArrayList<File>()
   for (file in dir.listFiles()) {
